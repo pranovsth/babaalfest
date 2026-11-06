@@ -12,11 +12,6 @@ export default function ContactPage() {
   return (
     <main className="inner-page">
       <SiteHeader active="contact" />
-      <header className="page-masthead section-shell">
-        <p>Get in touch</p>
-        <h1>Talk to our London team.</h1>
-        <span>Tickets, artist collaborations, venue partnerships and festival programming.</span>
-      </header>
       <ContactContent />
       <SiteFooter />
     </main>

@@ -5,21 +5,12 @@ import Link from "next/link";
 import { motion, MotionConfig, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, type ReactNode } from "react";
-
-const pastEvents = [
-  ["Nepal Music Festival 2026", "28 Feb 2026", "Troxy, London", "/event-nepal-music-festival.webp", "Festival"],
-  ["Vanja Vanji Party", "04 Jan 2025", "Studio 338, London", "/event-vanja-vanji.webp", "Concert"],
-  ["Kandara Live in Concert", "04 Jan 2025", "Indigo at The O2", "/event-kandara.webp", "Live music"],
-  ["Hamro New Year 2081", "27 Apr 2024", "Mill Hill School", "/event-hamro-new-year.webp", "Celebration"],
-  ["North London Nepalese Sanjh", "10 Feb 2024", "Mill Hill School", "/event-nepalese-sanjh.webp", "Culture"],
-] as const;
+import { useEffect, useRef, type FormEvent, type ReactNode } from "react";
 
 const galleryImages = [
   ["/event-babaal-fest-2026.png", "Babaal Fest 2026 event poster"],
-  ["/event-nepal-music-festival.webp", "Nepal Music Festival 2026 event artwork"],
-  ["/event-kandara.webp", "Kandara live concert event artwork"],
-  ["/event-vanja-vanji.webp", "Vanja Vanji Party event artwork"],
+  ["/event-north-fest-2025.png", "North Fest 2025 event poster"],
+  ["/event-north-fest-2024.png", "North Fest 2024 event poster"],
 ] as const;
 
 function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
@@ -108,15 +99,9 @@ export function HomeHighlights() {
       <div className="home-highlights">
         <section ref={sectionRef} className="home-featured section-shell">
           <motion.div className="home-featured-glow" style={{ y: glowY }} aria-hidden="true" />
-          <Reveal className="home-section-heading">
-            <div>
-              <p className="section-eyebrow">Featured events</p>
-              <h2>A curated lineup of Nepali music.</h2>
-            </div>
-            <div>
-              <p>From festival rituals to modern concert nights—every event is a chapter of Nepali culture.</p>
-              <Link className="text-link" href="/events">Browse all events <ArrowIcon /></Link>
-            </div>
+          <Reveal className="home-section-heading home-section-heading-simple">
+            <h2>Featured events</h2>
+            <Link className="text-link" href="/events">Browse all <ArrowIcon /></Link>
           </Reveal>
 
           <div ref={cardsRef} className="home-events-grid">
@@ -144,9 +129,8 @@ export function HomeHighlights() {
         </section>
 
         <section className="home-partners section-shell">
-          <Reveal className="home-partners-heading">
-            <p className="section-eyebrow">Our partners</p>
-            <h2>Built together. Felt everywhere.</h2>
+          <Reveal className="home-partners-heading home-partners-heading-simple">
+            <h2>Our partners</h2>
           </Reveal>
           <div className="partner-logo-grid">
             {[
@@ -174,41 +158,12 @@ export function HomeHighlights() {
 }
 
 export function EventsContent() {
-  const archiveRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const archive = archiveRef.current;
-    const track = trackRef.current;
-    if (!archive || !track) return;
-
-    const media = gsap.matchMedia();
-    media.add("(min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
-      const distance = () => Math.max(0, track.scrollWidth - document.documentElement.clientWidth + 96);
-      gsap.to(track, {
-        x: () => -distance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: archive,
-          start: "top top",
-          end: () => `+=${distance()}`,
-          scrub: 0.8,
-          pin: true,
-          invalidateOnRefresh: true,
-        },
-      });
-    });
-    return () => media.revert();
-  }, []);
-
   return (
     <MotionConfig reducedMotion="user">
       <div className="home-content">
         <section className="featured-section section-shell compact-section-top">
-          <Reveal className="section-heading">
-            <div><p className="section-eyebrow">Next on stage</p><h2>One festival. Every generation.</h2></div>
-            <p>A bright winter celebration of Nepali music arrives at Lakeside International Hotel in Frimley Green.</p>
+          <Reveal className="section-heading section-heading-simple">
+            <h2>Next on stage</h2>
           </Reveal>
           <motion.article
             className="featured-event"
@@ -234,28 +189,31 @@ export function EventsContent() {
           </motion.article>
         </section>
 
-        <section ref={archiveRef} className="archive-section">
-          <div className="archive-intro section-shell">
-            <p className="section-eyebrow">The archive</p>
-            <h2>Nights we still talk about.</h2>
-            <p>Swipe on mobile. Scroll to travel through the story on desktop.</p>
+        <section className="archive-section archive-section-compact">
+          <div className="archive-intro archive-intro-simple section-shell">
+            <h2>The archive</h2>
           </div>
-          <div ref={trackRef} className="events-track">
-            {pastEvents.map(([title, date, venue, image, tag], index) => (
-              <motion.article className="event-card" key={title} whileHover={{ y: -10 }} transition={{ type: "spring", stiffness: 260, damping: 22 }}>
-                <div className="event-card-media">
-                  <Image src={image} alt={`${title} event artwork`} fill sizes="(max-width: 900px) 78vw, 34vw" />
-                  <span>{String(index + 1).padStart(2, "0")}</span>
+          <div className="home-events-grid archive-events-grid section-shell">
+            {featuredEvents.slice(1).map((event) => (
+              <motion.article
+                className="home-event-card"
+                key={event.title}
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 260, damping: 22 }}
+              >
+                <div className="home-event-media">
+                  <Image src={event.image} alt={`${event.title} event artwork`} fill sizes="(max-width: 800px) 100vw, 48vw" />
+                  <span>{event.status}</span>
                 </div>
-                <div className="event-card-copy">
-                  <p>{tag}</p><h3>{title}</h3><div><time>{date}</time><span>{venue}</span></div>
+                <div className="home-event-copy">
+                  <p>{event.venue}</p>
+                  <h3>{event.title}</h3>
+                  <p className="home-event-description">{event.description}</p>
+                  <div className="home-event-meta"><time>{event.date}</time><span>{event.venue}</span></div>
+                  <Link className="home-event-link" href={event.href}>{event.cta} <ArrowIcon /></Link>
                 </div>
               </motion.article>
             ))}
-            <div className="archive-end-card">
-              <span>More memories</span><h3>Every crowd becomes family.</h3>
-              <Link href="/gallery">Enter the gallery <ArrowIcon /></Link>
-            </div>
           </div>
         </section>
       </div>
@@ -264,18 +222,31 @@ export function EventsContent() {
 }
 
 export function GalleryContent() {
+  const instagramUrl = "https://www.instagram.com/highlander_crew/";
+
   return (
     <MotionConfig reducedMotion="user">
-      <section className="gallery-section section-shell compact-section-top">
-        <Reveal className="section-heading gallery-heading">
-          <div><p className="section-eyebrow">Seen & felt</p><h2>Culture in motion.</h2></div>
-          <a className="text-link" href="https://www.instagram.com/highlander_crew/" target="_blank" rel="noreferrer">Follow on Instagram <ArrowIcon /></a>
+      <section className="gallery-section instagram-gallery section-shell compact-section-top">
+        <Reveal className="instagram-profile">
+          <div className="instagram-profile-identity">
+            <Image src="/highlander-crew-logo.png" alt="" width={1189} height={1323} />
+            <div>
+              <p className="section-eyebrow">Gallery</p>
+              <h1>@highlander_crew</h1>
+              <p>Event posters, artists and moments from the Highlander Crew community.</p>
+            </div>
+          </div>
+          <a href={instagramUrl} target="_blank" rel="noreferrer">View Instagram <ArrowIcon /></a>
         </Reveal>
-        <div className="gallery-grid">
+        <div className="instagram-gallery-grid">
           {galleryImages.map(([src, alt], index) => (
-            <motion.figure
-              className={`gallery-tile gallery-tile-${index + 1}`}
+            <motion.a
+              className="instagram-gallery-tile"
               key={src}
+              href={instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`View ${alt} on Instagram`}
               initial={{ opacity: 0, y: 32 }}
               whileInView={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 0.985 }}
@@ -283,7 +254,8 @@ export function GalleryContent() {
               transition={{ duration: 0.65, delay: index * 0.06 }}
             >
               <Image src={src} alt={alt} fill sizes="(max-width: 700px) 100vw, 50vw" />
-            </motion.figure>
+              <span>View on Instagram <ArrowIcon /></span>
+            </motion.a>
           ))}
         </div>
       </section>
@@ -340,21 +312,64 @@ export function AboutContent() {
 }
 
 export function ContactContent() {
+  const submitEnquiry = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name = String(data.get("name") ?? "");
+    const mobile = String(data.get("mobile") ?? "");
+    const email = String(data.get("email") ?? "");
+    const subject = String(data.get("subject") ?? "General enquiry");
+    const message = String(data.get("message") ?? "");
+    const emailSubject = encodeURIComponent(`${subject} — ${name}`);
+    const emailBody = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nMobile / WhatsApp: ${mobile}\nSubject: ${subject}\n\nMessage:\n${message}`,
+    );
+
+    window.location.href = `mailto:highlandercrew@outlook.com?subject=${emailSubject}&body=${emailBody}`;
+  };
+
   return (
     <MotionConfig reducedMotion="user">
-      <section className="contact-section section-shell compact-section-top">
-        <Reveal className="contact-copy">
-          <p className="section-eyebrow">Join the family</p><h2>Ready to celebrate together?</h2>
-          <p>Whether you&apos;re joining the audience, representing an artist or looking to partner, there is a place for you with Highlander Crew.</p>
-          <div className="contact-actions">
-            <a className="primary-action" href="mailto:highlandercrew@outlook.com">Start an enquiry <ArrowIcon /></a>
-            <a className="secondary-action" href="https://wa.me/447496555863" target="_blank" rel="noreferrer">WhatsApp booking</a>
+      <section className="contact-section contact-section-simple section-shell compact-section-top">
+        <Reveal className="contact-intro">
+          <p className="section-eyebrow">Contact</p>
+          <h1>Send an enquiry.</h1>
+          <p>Questions about tickets, artists, partnerships or an upcoming event? Tell us what you need and our team will get back to you.</p>
+          <div className="contact-quick-links">
+            <a href="mailto:highlandercrew@outlook.com"><span>Email</span><strong>highlandercrew@outlook.com</strong></a>
+            <a href="tel:+447496555863"><span>Phone</span><strong>+44 7496 555863</strong></a>
+            <a href="https://wa.me/447496555863" target="_blank" rel="noreferrer"><span>WhatsApp</span><strong>Message the booking team ↗</strong></a>
           </div>
         </Reveal>
-        <Reveal className="contact-panel" delay={0.1}>
-          <a href="mailto:highlandercrew@outlook.com"><span>Email</span><strong>highlandercrew@outlook.com</strong></a>
-          <a href="tel:+447496555863"><span>Phone</span><strong>+44 7496 555863</strong></a>
-          <div><span>Office</span><strong>82 Montrose Ave, Edgware HA8 0DT</strong></div>
+
+        <Reveal className="enquiry-card" delay={0.1}>
+          <div className="enquiry-heading">
+            <p className="section-eyebrow">Enquiry form</p>
+            <h2>How can we help?</h2>
+          </div>
+          <form className="enquiry-form" onSubmit={submitEnquiry}>
+            <div className="enquiry-form-row">
+              <label>Your name *<input name="name" type="text" autoComplete="name" placeholder="Full name" required /></label>
+              <label>Mobile number *<input name="mobile" type="tel" autoComplete="tel" placeholder="+44 7…" required /></label>
+            </div>
+            <label>Email address *<input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></label>
+            <label>Subject
+              <select name="subject" defaultValue="Event booking">
+                <option>Event booking</option>
+                <option>Artist enquiry</option>
+                <option>Partnership or sponsorship</option>
+                <option>Press and media</option>
+                <option>General enquiry</option>
+              </select>
+            </label>
+            <label>Your message *<textarea name="message" rows={5} placeholder="Tell us how we can help…" required /></label>
+            <label className="enquiry-consent">
+              <input name="consent" type="checkbox" required />
+              <span>I agree to Highlander Crew using these details to respond to my enquiry.</span>
+            </label>
+            <button type="submit">Send enquiry <ArrowIcon /></button>
+            <p className="enquiry-note">Submitting prepares the enquiry in your email app so you can review and send it.</p>
+          </form>
         </Reveal>
       </section>
     </MotionConfig>

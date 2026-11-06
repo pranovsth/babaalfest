@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
 import "./globals.css";
+import SiteChat from "./site-chat";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -18,7 +19,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${oswald.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <SiteChat />
+      </body>
     </html>
   );
 }
